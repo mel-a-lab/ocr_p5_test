@@ -15,7 +15,7 @@ import { User } from '../../interfaces/user.interface';
 // Import global pour Jest
 import 'jest';
 
-describe('MeComponent', () => {
+describe('MeComponent Integration Test', () => {
     let component: MeComponent;
     let fixture: ComponentFixture<MeComponent>;
     let mockRouter: any;
@@ -30,17 +30,22 @@ describe('MeComponent', () => {
         mockSessionService = {
             sessionInformation: {
                 admin: true,
-                id: 1
+                id: 1,
+                token: 'sample-token',
+                type: 'admin',
+                username: 'testuser',
+                firstName: 'Test',
+                lastName: 'User'
             },
+            $isLogged: jest.fn().mockReturnValue(of(true)),
             logOut: jest.fn()
         };
         mockUserService = {
             getById: jest.fn().mockReturnValue(of({
                 id: 1,
-                name: 'Test User',
-                email: 'test@example.com',
-                lastName: 'Doe',
                 firstName: 'John',
+                lastName: 'Doe',
+                email: 'test@example.com',
                 admin: true,
                 password: 'test!1234',
                 createdAt: new Date()
@@ -67,8 +72,7 @@ describe('MeComponent', () => {
                 { provide: UserService, useValue: mockUserService },
                 { provide: MatSnackBar, useValue: mockMatSnackBar }
             ],
-        })
-            .compileComponents();
+        }).compileComponents();
 
         fixture = TestBed.createComponent(MeComponent);
         component = fixture.componentInstance;
@@ -83,10 +87,9 @@ describe('MeComponent', () => {
         expect(mockUserService.getById).toHaveBeenCalledWith('1');
         expect(component.user).toEqual({
             id: 1,
-            name: 'Test User',
-            email: 'test@example.com',
-            lastName: 'Doe',
             firstName: 'John',
+            lastName: 'Doe',
+            email: 'test@example.com',
             admin: true,
             password: 'test!1234',
             createdAt: expect.any(Date)
