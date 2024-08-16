@@ -72,4 +72,7 @@ public class TeacherControllerIntegrationTest {
                 .andExpect(jsonPath("$[1].firstName").value("John"))
                 .andExpect(jsonPath("$[1].lastName").value("Smith"));
     }
+
+    // erreur lié à l'authentification
+    // test un find sur quelchse qui n'existe et que ça retourne bien notFoundException
 }
