@@ -7,6 +7,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { expect } from '@jest/globals';
+import { AuthService } from '../../services/auth.service';
+import { throwError } from 'rxjs';
+
 
 import { RegisterComponent } from './register.component';
 
@@ -15,18 +18,39 @@ describe('RegisterComponent', () => {
   let fixture: ComponentFixture<RegisterComponent>;
 
   beforeEach(async () => {
+    // await TestBed.configureTestingModule({
+    //   declarations: [RegisterComponent],
+    //   imports: [
+    //     BrowserAnimationsModule,
+    //     HttpClientModule,
+    //     ReactiveFormsModule,
+    //     MatCardModule,
+    //     MatFormFieldModule,
+    //     MatIconModule,
+    //     MatInputModule
+    //   ]
+    // })
     await TestBed.configureTestingModule({
       declarations: [RegisterComponent],
+      providers: [
+        {
+          provide: AuthService,
+          useValue: {
+            register: jest.fn(),
+          },
+        },
+      ],
       imports: [
         BrowserAnimationsModule,
         HttpClientModule,
-        ReactiveFormsModule,  
+        ReactiveFormsModule,
         MatCardModule,
         MatFormFieldModule,
         MatIconModule,
         MatInputModule
       ]
     })
+
       .compileComponents();
 
     fixture = TestBed.createComponent(RegisterComponent);
@@ -37,4 +61,15 @@ describe('RegisterComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+  it('should set onError to true when register fails', () => {
+    const authService = TestBed.inject(AuthService);
+    (authService.register as jest.Mock).mockReturnValue(
+      throwError(() => new Error('fail'))
+    );
+
+    component.submit();
+
+    expect(component.onError).toBe(true);
+  });
+
 });

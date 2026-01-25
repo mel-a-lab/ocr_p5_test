@@ -9,6 +9,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { expect } from '@jest/globals';
 import { SessionService } from 'src/app/services/session.service';
+import { AuthService } from '../../services/auth.service';
+import { throwError } from 'rxjs';
+
+
 
 import { LoginComponent } from './login.component';
 
@@ -19,7 +23,16 @@ describe('LoginComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [LoginComponent],
-      providers: [SessionService],
+      providers: [
+        SessionService,
+        {
+          provide: AuthService,
+          useValue: {
+            login: jest.fn(),
+          },
+        },
+      ],
+
       imports: [
         RouterTestingModule,
         BrowserAnimationsModule,
@@ -39,4 +52,15 @@ describe('LoginComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should set onError to true when login fails', () => {
+    const authService = TestBed.inject(AuthService);
+    (authService.login as jest.Mock).mockReturnValue(throwError(() => new Error('fail')));
+
+    component.submit();
+
+    expect(component.onError).toBe(true);
+  });
+
+
 });
